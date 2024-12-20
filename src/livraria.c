@@ -10,6 +10,7 @@
 typedef struct _Livraria_ {
     int maxItens;
     int tamAtual;
+    int contador;
     void ** item;
 } Livraria;
 
@@ -20,6 +21,7 @@ Livraria *livrariaCreate(int maxItens){
 		if (l != NULL){
 			l -> maxItens = maxItens;
 			l -> tamAtual = 0;
+			l -> contador = 0;
 			l -> item = (void **)malloc(sizeof(void *) * maxItens);
 			if (l -> item != NULL){
 				printf("Livraria criada com sucesso!\n");
@@ -63,6 +65,7 @@ void * livroRemove(Livraria * l, int key){
 			}
 			l -> item[l -> tamAtual] = NULL;
 			l -> tamAtual--;
+			l -> contador = 0;
 			printf("Livro removido com sucesso!\n");
 			fflush(stdout);
 
@@ -75,21 +78,26 @@ void * livroRemove(Livraria * l, int key){
 	return NULL;
 }
 
-int livrariaQuery(Livraria * l, int key){
-	if (l != NULL && l -> tamAtual > 0){
-		if (key >= 0 && key < l -> maxItens){
-			if (l -> item[key] != NULL){
-				printf("Livro encontrado\n");
-				fflush(stdout);
-
-				return TRUE;
+void * livrariaQuery(Livraria * l, void * key, int (*cmp)(void*, void*)){
+	int stat, i = 0;
+	if (l != NULL && key != NULL){
+		if(l -> tamAtual > 0){
+			if (key >= 0){
+				stat = cmp(l -> item[i], key);
+				while (stat != TRUE && i < l -> tamAtual){
+					i++;
+					stat = cmp(l -> item[i], key);
+				}
+				if (stat == TRUE){
+					return l -> item[i];
+				}
 			}
 		}
 	}
 	printf("Não foi possível encontrar livro\n");
 	fflush(stdout);
 
-	return FALSE;
+	return NULL;
 }
 
 int livrariaDestroy(Livraria * l){
@@ -132,16 +140,15 @@ int returnTam(Livraria *l){
 }
 
 void *returnNext(Livraria * l){
-	static int counter = 0;
-	if (l -> tamAtual - 1 <= counter){
-		counter = 0;
-	}
-	int aux = counter;
+	int aux = l -> contador;
 	if (l != NULL){
-		if (counter < l -> tamAtual){
-			counter++;
+		if (l -> contador < l -> tamAtual){
+			l -> contador++;
 			return l -> item[aux];
 		}
+	}
+	else {
+		l -> contador = 0;
 	}
 	return NULL;
 }

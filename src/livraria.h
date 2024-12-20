@@ -64,7 +64,7 @@ por key ele existir no TAD Livraria, ou FALSE caso
 contrátrio
 -------------------------------------------------*/
 
-int livrariaQuery(Livraria *l, int key);
+int livrariaQuery(Livraria *l, int key, int (*cmp)(void*, void*));
 
 /*-------------------------------------------------
 Destroi um TAD Livraria

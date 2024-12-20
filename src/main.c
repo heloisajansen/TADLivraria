@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "livraria.h"
 
@@ -18,10 +19,14 @@ void livrariaShowElm(Livraria * l){
 	if (l != NULL){
 		for (int i = 0; i < returnTam(l); i++){
 			livro = (Livro*) returnNext(l);
-			printf("%s\n", livro -> titulo);
-			printf("%d\n", livro -> qntdPags);
-			printf("%.2f\n", livro -> preco);
-			fflush(stdout);
+			while (livro != NULL){
+				printf("%s\n", livro -> titulo);
+				printf("%d\n", livro -> qntdPags);
+				printf("%.2f\n", livro -> preco);
+				fflush(stdout);
+
+				livro = (Livro*) returnNext(l);
+			}
 		}
 	}
 	else{
@@ -30,9 +35,21 @@ void livrariaShowElm(Livraria * l){
 	}
 }
 
+int cmp(void * item, void * key){
+	Livro * ptrItem = (Livro*) item;
+	Livro * ptrKey = (Livro*) key;
+	if (ptrItem != NULL && ptrKey != NULL){
+		if (strcmp(ptrItem -> titulo, ptrKey -> titulo) == 0){
+			return TRUE;
+		}
+	}
+	return FALSE;
+}
+
 
 int main(void){
 	Livro * livro = NULL;
+	Livro * keyLivro = NULL;
 	Livraria * l = NULL;
 	int escolha, maxItens, key;
 	int continuar = TRUE;
@@ -89,11 +106,21 @@ int main(void){
 		}
 
 		if (escolha == 4){
-			printf("Digite o índice do livro que deseja procurar:\n");
+			keyLivro = (Livro*) malloc(sizeof(Livro));
+			printf("Digite o título do livro que deseja procurar:\n");
+			fflush(stdout);
+			scanf("%s", keyLivro -> titulo);
 			fflush(stdout);
 
-			scanf("%d", &key);
-			livrariaQuery(l, key);
+			keyLivro -> qntdPags = 0;
+			keyLivro -> preco = 0;
+
+			Livro * keyLivroAchou = (Livro*) livrariaQuery(l, keyLivro, cmp);
+			if (keyLivroAchou != NULL){
+				printf("%s\n", keyLivroAchou -> titulo);
+				printf("%d\n", keyLivroAchou -> qntdPags);
+				printf("%f\n", keyLivroAchou -> preco);
+			}
 		}
 
 		if (escolha == 5){
